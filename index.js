@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.use("/usuario", rotaUsuario)
 app.use("/cadastrarUsuario", rotaUsuario)
-
+app.use("/login", rotaUsuario)
 
 
 
