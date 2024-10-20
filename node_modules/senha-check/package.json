@@ -1,0 +1,23 @@
+{
+  "name": "senha-check",
+  "version": "1.0.2",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc"
+  },
+  "keywords": [
+    "validador",
+    "validator",
+    "password",
+    "senha"
+  ],
+  "author": "JosephusDev",
+  "license": "ISC",
+  "description": "Pacote de validação e verificação de força de senhas.",
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.2"
+  }
+}
