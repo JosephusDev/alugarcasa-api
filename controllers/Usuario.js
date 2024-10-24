@@ -52,9 +52,6 @@ export const cadastrar = async (req, res) => {
 };
 
 
-
-
-
 export const login = async (req, res) => {
     const { nome, senha } = req.body;
 
@@ -80,23 +77,11 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Senha incorreta.' });
         }
 
-        // Se o login for bem-sucedido, buscar as propriedades do usuário
-        const [propriedades] = await pool.query('SELECT * FROM propriedade WHERE id_usuario = ?', [usuario.id]);
-
-        // Se o usuário não tiver propriedades
-        if (propriedades.length === 0) {
-            return res.status(200).json({
-                message: 'Login bem-sucedido, mas o usuário não possui propriedades.',
-                usuario: { id: usuario.id, nome: usuario.nome },
-                propriedades: []
-            });
-        }
-
-        // Retornar as propriedades do usuário junto com o sucesso do login
+       
+        // Retornar Usuario com sucesso do login
         return res.status(200).json({
             message: 'Login bem-sucedido',
-            usuario: { id: usuario.id, nome: usuario.nome },
-            propriedades: propriedades
+            usuario: { id: usuario.id, nome: usuario.nome }
         });
 
     } catch (error) {
@@ -104,3 +89,14 @@ export const login = async (req, res) => {
         return res.status(500).json({ message: 'Erro ao fazer login.' });
     }
 };
+
+//Apenas para esta testes
+export const carregar = async(req, res) => {
+    const [usuarios] = await pool.query("SELECT * FROM usuario");
+
+    if (usuarios.length < 1) {
+        return res.status(200).json({"Message": "Nenhuma usuario"});
+    }
+
+    return res.status(200).json(usuarios);
+}
