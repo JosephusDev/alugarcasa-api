@@ -2,12 +2,20 @@ import express from 'express'
 import cors from 'cors'
 import rotaUsuario from './routes/Usuario.js'
 import rotaPropriedade from './routes/Propriedade.js'
+import { autenticarToken } from './middleware/autenticacao.js'
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 
+//Rotas públicas
 app.use('/usuario', rotaUsuario)
+
+//Middleware para verificar token JWT
+
+app.use(autenticarToken)
+
+//Rotas privadas
 app.use('/propriedade', rotaPropriedade)
 
 // Iniciar o servidor

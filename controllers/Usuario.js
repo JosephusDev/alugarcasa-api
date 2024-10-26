@@ -1,6 +1,7 @@
 import { pool } from '../config/database.js'
 import ValidadorSenha from 'senha-check'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 const esquema = new ValidadorSenha()
 
@@ -47,7 +48,9 @@ export const cadastrar = async (req, res) => {
     return res.status(201).json({ message: 'Usuário cadastrado com sucesso' })
   } catch (error) {
     console.error('Erro ao cadastrar usuário:', error)
-    return res.status(500).json({ message: 'Erro ao cadastrar usuário.' })
+    return res
+      .status(500)
+      .json({ message: 'Erro ao cadastrar usuário.', error: error.message })
   }
 }
 
@@ -78,10 +81,16 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Senha incorreta.' })
     }
 
+    // Gerar o JWT
+    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
+      expiresIn: '3m',
+    })
+
     // Retornar Usuario com sucesso do login
     return res.status(200).json({
       id: usuario.id,
       nome: usuario.nome,
+      token,
     })
   } catch (error) {
     console.error('Erro ao fazer login:', error)
