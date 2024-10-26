@@ -8,7 +8,6 @@ esquema
   .min(4)
   .max(8)
   .temCaracteresEspeciais()
-  .temMaiusculas(2)
   .temMinusculas()
   .sem()
   .digitos()
@@ -27,25 +26,13 @@ export const cadastrar = async (req, res) => {
 
   // Validação da senha usando o esquema de validação
   if (!esquema.validar(senha)) {
-    return res
-      .status(400)
-      .json({
-        message: 'Senha Inválida.',
-        detalhes: esquema.validar(senha, { detalhes: true }),
-      })
+    return res.status(400).json({
+      message: 'Senha Inválida.',
+      detalhes: esquema.validar(senha, { detalhes: true }),
+    })
   }
 
   try {
-    // Verifica se o nome de usuário já existe
-    const [existingUser] = await pool.query(
-      'SELECT * FROM usuario WHERE nome = ?',
-      [nome],
-    )
-
-    if (existingUser.length > 0) {
-      return res.status(400).json({ message: 'Nome de usuário já existe.' })
-    }
-
     // Hash da senha com bcrypt
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(senha, saltRounds)
@@ -93,8 +80,8 @@ export const login = async (req, res) => {
 
     // Retornar Usuario com sucesso do login
     return res.status(200).json({
-      message: 'Login bem-sucedido',
-      usuario: { id: usuario.id, nome: usuario.nome },
+      id: usuario.id,
+      nome: usuario.nome,
     })
   } catch (error) {
     console.error('Erro ao fazer login:', error)
@@ -107,7 +94,7 @@ export const carregar = async (req, res) => {
   const [usuarios] = await pool.query('SELECT * FROM usuario')
 
   if (usuarios.length < 1) {
-    return res.status(200).json({ Message: 'Nenhuma usuario' })
+    return res.status(200).json({ Message: 'Nenhum usuario' })
   }
 
   return res.status(200).json(usuarios)

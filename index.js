@@ -8,7 +8,6 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/usuario', rotaUsuario)
-
 app.use('/propriedade', rotaPropriedade)
 
 // Iniciar o servidor
