@@ -1,102 +1,114 @@
-import { pool } from "../config/database.js";
-import ValidadorSenha from "senha-check";
-import bcrypt from "bcryptjs";
+import { pool } from '../config/database.js'
+import ValidadorSenha from 'senha-check'
+import bcrypt from 'bcryptjs'
 
-const esquema = new ValidadorSenha();
+const esquema = new ValidadorSenha()
 
 esquema
-    .min(4)
-    .max(8)
-    .temCaracteresEspeciais()
-    .temMaiusculas(2)
-    .temMinusculas()
-    .sem().digitos()
-    .sem().espaco();
-
-
+  .min(4)
+  .max(8)
+  .temCaracteresEspeciais()
+  .temMaiusculas(2)
+  .temMinusculas()
+  .sem()
+  .digitos()
+  .sem()
+  .espaco()
 
 export const cadastrar = async (req, res) => {
-    const { nome, senha } = req.body;
+  const { nome, senha } = req.body
 
-    // Verificação se o nome e a senha foram fornecidos
-    if (!nome || !senha) {
-        return res.status(400).json({ message: "Informe todos os dados necessários (nome e senha)." });
+  // Verificação se o nome e a senha foram fornecidos
+  if (!nome || !senha) {
+    return res
+      .status(400)
+      .json({ message: 'Informe todos os dados necessários (nome e senha).' })
+  }
+
+  // Validação da senha usando o esquema de validação
+  if (!esquema.validar(senha)) {
+    return res
+      .status(400)
+      .json({
+        message: 'Senha Inválida.',
+        detalhes: esquema.validar(senha, { detalhes: true }),
+      })
+  }
+
+  try {
+    // Verifica se o nome de usuário já existe
+    const [existingUser] = await pool.query(
+      'SELECT * FROM usuario WHERE nome = ?',
+      [nome],
+    )
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: 'Nome de usuário já existe.' })
     }
 
-    // Validação da senha usando o esquema de validação
-    if (!esquema.validar(senha)) {
-        return res.status(400).json({ message: "Senha Inválida.", detalhes: esquema.validar(senha, { detalhes: true }) });
-    }
+    // Hash da senha com bcrypt
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(senha, saltRounds)
 
-    try {
-        // Verifica se o nome de usuário já existe
-        const [existingUser] = await pool.query('SELECT * FROM usuario WHERE nome = ?', [nome]);
+    // Inserir o usuário no banco de dados
+    const [result] = await pool.query(
+      'INSERT INTO usuario (nome, senha) VALUES (?, ?)',
+      [nome, hashedPassword],
+    )
 
-        if (existingUser.length > 0) {
-            return res.status(400).json({ message: 'Nome de usuário já existe.' });
-        }
-
-        // Hash da senha com bcrypt
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(senha, saltRounds);
-
-        // Inserir o usuário no banco de dados
-        const [result] = await pool.query('INSERT INTO usuario (nome, senha) VALUES (?, ?)', [nome, hashedPassword]);
-
-        // Retornar sucesso com o ID do usuário recém-cadastrado
-        return res.status(201).json({ message: 'Usuário cadastrado com sucesso'});
-    } catch (error) {
-        console.error('Erro ao cadastrar usuário:', error);
-        return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
-    }
-};
-
+    // Retornar sucesso com o ID do usuário recém-cadastrado
+    return res.status(201).json({ message: 'Usuário cadastrado com sucesso' })
+  } catch (error) {
+    console.error('Erro ao cadastrar usuário:', error)
+    return res.status(500).json({ message: 'Erro ao cadastrar usuário.' })
+  }
+}
 
 export const login = async (req, res) => {
-    const { nome, senha } = req.body;
+  const { nome, senha } = req.body
 
-    // Verificar se ambos os campos foram fornecidos
-    if (!nome || !senha) {
-        return res.status(400).json({ message: 'Informe o nome e a senha.' });
+  // Verificar se ambos os campos foram fornecidos
+  if (!nome || !senha) {
+    return res.status(400).json({ message: 'Informe o nome e a senha.' })
+  }
+
+  try {
+    // Verificar se o usuário com o nome fornecido existe
+    const [user] = await pool.query('SELECT * FROM usuario WHERE nome = ?', [
+      nome,
+    ])
+
+    if (user.length === 0) {
+      return res.status(404).json({ message: 'Usuário não encontrado.' })
     }
 
-    try {
-        // Verificar se o usuário com o nome fornecido existe
-        const [user] = await pool.query('SELECT * FROM usuario WHERE nome = ?', [nome]);
+    const usuario = user[0]
 
-        if (user.length === 0) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
-        }
+    // Comparar a senha fornecida com o hash da senha armazenada
+    const senhaValida = await bcrypt.compare(senha, usuario.senha)
 
-        const usuario = user[0];
-
-        // Comparar a senha fornecida com o hash da senha armazenada
-        const senhaValida = await bcrypt.compare(senha, usuario.senha);
-
-        if (!senhaValida) {
-            return res.status(401).json({ message: 'Senha incorreta.' });
-        }
-
-       
-        // Retornar Usuario com sucesso do login
-        return res.status(200).json({
-            message: 'Login bem-sucedido',
-            usuario: { id: usuario.id, nome: usuario.nome }
-        });
-
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        return res.status(500).json({ message: 'Erro ao fazer login.' });
+    if (!senhaValida) {
+      return res.status(401).json({ message: 'Senha incorreta.' })
     }
-};
+
+    // Retornar Usuario com sucesso do login
+    return res.status(200).json({
+      message: 'Login bem-sucedido',
+      usuario: { id: usuario.id, nome: usuario.nome },
+    })
+  } catch (error) {
+    console.error('Erro ao fazer login:', error)
+    return res.status(500).json({ message: 'Erro ao fazer login.' })
+  }
+}
 
 //Apenas para esta testes
-export const carregar = async(req, res) => {
-    const [usuarios] = await pool.query("SELECT * FROM usuario");
+export const carregar = async (req, res) => {
+  const [usuarios] = await pool.query('SELECT * FROM usuario')
 
-    if (usuarios.length < 1) {
-        return res.status(200).json({"Message": "Nenhuma usuario"});
-    }
+  if (usuarios.length < 1) {
+    return res.status(200).json({ Message: 'Nenhuma usuario' })
+  }
 
-    return res.status(200).json(usuarios);
+  return res.status(200).json(usuarios)
 }

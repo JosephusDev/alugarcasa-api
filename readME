@@ -1,10 +1,10 @@
 #Gerir usuários
 rota para Cadastrar novo usuario:
-     /cadastrarUsuario
-     {
-        "nome":
-        "senha":
-     }
+/cadastrarUsuario
+{
+"nome":
+"senha":
+}
 
 rota para Login de usuario:
 
