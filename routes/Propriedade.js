@@ -8,10 +8,11 @@ import {
 } from '../controllers/Propriedade.js'
 
 const router = express.Router()
-router.get('/carregar', carregar)
-router.get('/carregarPorUsuario/:id', carregarPorUsuario)
-router.post('/cadastrar', cadastrar)
-router.put('/editar', editar)
-router.delete('/eliminar/:id', eliminar)
+
+router.get('/', carregar)
+router.get('/:id', carregarPorUsuario)
+router.post('/', cadastrar)
+router.put('/:id', editar)
+router.delete('/:id', eliminar)
 
 export default router

@@ -6,7 +6,7 @@ export const carregar = async (req, res) => {
   const [propriedades] = await pool.query('SELECT * FROM propriedade')
 
   //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
-  if (propriedades.length < 1) {
+  if (propriedades.length === 0) {
     return res.status(200).json({ Message: 'Nenhuma propriedade encontrada' })
   }
   //Retornar todas as propriedades selecionadas
@@ -16,16 +16,16 @@ export const carregar = async (req, res) => {
 //CARREGAR TODAS AS PROPRIEDADES CADASTRADAS DE UM USUARIO
 export const carregarPorUsuario = async (req, res) => {
   //Pegar o ID do usuario
-  //const { id } = req.params.id; deste jeito não funcionou! help :(
+  const id = req.params.id
 
   //Query para selecionar todas as propriedades
   const [propriedades] = await pool.query(
     'SELECT * FROM propriedade WHERE id_usuario = ?',
-    [req.params.id],
+    [id],
   )
 
   //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
-  if (propriedades.length < 1) {
+  if (propriedades.length === 0) {
     return res
       .status(200)
       .json({ Message: 'Nenhuma propriedade do usuario encontrada' })
@@ -58,7 +58,8 @@ export const cadastrar = async (req, res) => {
 
 export const editar = async (req, res) => {
   //Pegar os campos enviados
-  const { id, descricao, cidade, bairro, preco, imagem } = req.body
+  const { descricao, cidade, bairro, preco, imagem } = req.body
+  const id = req.params.id
   try {
     //Fazer a atualizacao dos dados
     await pool.query(
@@ -78,10 +79,10 @@ export const editar = async (req, res) => {
 }
 
 export const eliminar = async (req, res) => {
-  //const { id } = req.params.id; assim não tá funcionando! help ;(
+  const id = req.params.id
   try {
     //Fazer a exclusao da propriedade
-    await pool.query('DELETE FROM propriedade WHERE id = ?', [req.params.id])
+    await pool.query('DELETE FROM propriedade WHERE id = ?', [id])
     //Retornar uma mensagem caso esteja tudo certo
     return res
       .status(200)
