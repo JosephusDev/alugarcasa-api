@@ -27,8 +27,7 @@ export const cadastrar = async (req, res) => {
 
   // Validação da senha usando o esquema de validação
   if (!esquema.validar(senha)) {
-    return res.status(400).json({
-      message: 'Senha Inválida.',
+    return res.status(200).json({
       detalhes: esquema.validar(senha, { detalhes: true }),
     })
   }
@@ -45,7 +44,7 @@ export const cadastrar = async (req, res) => {
     )
 
     // Retornar sucesso com o ID do usuário recém-cadastrado
-    return res.status(201).json({ message: 'Usuário cadastrado com sucesso' })
+    return res.status(200).json({ message: 'Usuário cadastrado com sucesso' })
   } catch (error) {
     console.error('Erro ao cadastrar usuário:', error)
     return res
@@ -69,7 +68,7 @@ export const login = async (req, res) => {
     ])
 
     if (user.length === 0) {
-      return res.status(404).json({ message: 'Usuário não encontrado.' })
+      return res.status(200).json({ message: 'Usuário não encontrado.' })
     }
 
     const usuario = user[0]
@@ -78,23 +77,23 @@ export const login = async (req, res) => {
     const senhaValida = await bcrypt.compare(senha, usuario.senha)
 
     if (!senhaValida) {
-      return res.status(401).json({ message: 'Senha incorreta.' })
+      return res.status(200).json({ message: 'Senha incorreta.' })
     }
 
     // Gerar o JWT
     const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
-      expiresIn: '3m',
+      expiresIn: '1h',
     })
 
     // Retornar Usuario com sucesso do login
-    return res.status(200).json({
+    return res.json({
       id: usuario.id,
       nome: usuario.nome,
       token,
     })
   } catch (error) {
     console.error('Erro ao fazer login:', error)
-    return res.status(500).json({ message: 'Erro ao fazer login.' })
+    return res.status(500).json({ message: error })
   }
 }
 
