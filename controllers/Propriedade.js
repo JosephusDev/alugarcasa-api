@@ -105,6 +105,6 @@ export const eliminar = async (req, res) => {
     //Retornar mensagem de erro! Bombo molhou :) ;)
     return res
       .status(500)
-      .json({ message: 'Erro ao eliminar a propriedade!', Erro: error })
+      .json({ message: 'Erro ao eliminar a propriedade!' })
   }
 }
