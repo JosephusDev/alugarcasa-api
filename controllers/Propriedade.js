@@ -2,15 +2,22 @@ import { pool } from '../config/database.js'
 
 //CARREGAR TODAS AS PROPRIEDADES CADASTRADAS
 export const carregar = async (req, res) => {
-  //Query para selecionar todas as propriedades
-  const [propriedades] = await pool.query('SELECT * FROM propriedade')
+  try {
+    //Query para selecionar todas as propriedades
+    const [propriedades] = await pool.query('SELECT * FROM propriedade')
 
-  //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
-  if (propriedades.length === 0) {
-    return res.status(200).json({ Message: 'Nenhuma propriedade encontrada' })
+    //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
+    if (propriedades.length === 0) {
+      return res.status(200).json({ Message: 'Nenhuma propriedade encontrada' })
+    }
+    //Retornar todas as propriedades selecionadas
+    return res.status(200).json(propriedades)
+  } catch (error) {
+    //Retornar Mensagem de erro
+    return res
+      .status(500)
+      .json({ message: 'Erro ao carregar propriedades', Erro: error })
   }
-  //Retornar todas as propriedades selecionadas
-  return res.status(200).json(propriedades)
 }
 
 //CARREGAR TODAS AS PROPRIEDADES CADASTRADAS DE UM USUARIO
@@ -18,20 +25,27 @@ export const carregarPorUsuario = async (req, res) => {
   //Pegar o ID do usuario
   const id = req.params.id
 
-  //Query para selecionar todas as propriedades
-  const [propriedades] = await pool.query(
-    'SELECT * FROM propriedade WHERE id_usuario = ?',
-    [id],
-  )
+  try {
+      //Query para selecionar todas as propriedades
+      const [propriedades] = await pool.query(
+        'SELECT * FROM propriedade WHERE id_usuario = ?',
+        [id],
+      )
 
-  //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
-  if (propriedades.length === 0) {
+      //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
+      if (propriedades.length === 0) {
+        return res
+          .status(200)
+          .json({ Message: 'Nenhuma propriedade do usuario encontrada' })
+      }
+      //Retornar todas as propriedades selecionadas
+      return res.status(200).json(propriedades)
+  } catch (error) {
+    //Retornar Mensagem de erro
     return res
-      .status(200)
-      .json({ Message: 'Nenhuma propriedade do usuario encontrada' })
+      .status(500)
+      .json({ message: 'Erro ao carregar propriedades do usuário', Erro: error })
   }
-  //Retornar todas as propriedades selecionadas
-  return res.status(200).json(propriedades)
 }
 
 export const cadastrar = async (req, res) => {

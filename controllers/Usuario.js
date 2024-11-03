@@ -21,7 +21,7 @@ export const cadastrar = async (req, res) => {
   // Verificação se o nome e a senha foram fornecidos
   if (!nome || !senha) {
     return res
-      .status(400)
+      .status(201)
       .json({ message: 'Informe todos os dados necessários (nome e senha).' })
   }
 
@@ -38,7 +38,7 @@ export const cadastrar = async (req, res) => {
     const hashedPassword = await bcrypt.hash(senha, saltRounds)
 
     // Inserir o usuário no banco de dados
-    const [result] = await pool.query(
+    await pool.query(
       'INSERT INTO usuario (nome, senha) VALUES (?, ?)',
       [nome, hashedPassword],
     )
@@ -68,7 +68,7 @@ export const login = async (req, res) => {
     ])
 
     if (user.length === 0) {
-      return res.status(200).json({ message: 'Usuário não encontrado.' })
+      return res.status(204).json({ message: 'Usuário não encontrado.' })
     }
 
     const usuario = user[0]
@@ -101,8 +101,8 @@ export const login = async (req, res) => {
 export const carregar = async (req, res) => {
   const [usuarios] = await pool.query('SELECT * FROM usuario')
 
-  if (usuarios.length < 1) {
-    return res.status(200).json({ Message: 'Nenhum usuario' })
+  if (usuarios.length === 0) {
+    return res.status(204).json({ Message: 'Nenhum usuario' })
   }
 
   return res.status(200).json(usuarios)
