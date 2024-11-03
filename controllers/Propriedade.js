@@ -100,7 +100,7 @@ export const eliminar = async (req, res) => {
     //Retornar uma mensagem caso esteja tudo certo
     return res
       .status(200)
-      .json({ message: 'Propriedade eliminada com sucesso :)' })
+      .json({ message: 'Propriedade eliminada com sucesso!' })
   } catch (error) {
     //Retornar mensagem de erro! Bombo molhou :) ;)
     return res
