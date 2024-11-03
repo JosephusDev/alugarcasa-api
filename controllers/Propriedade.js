@@ -8,7 +8,7 @@ export const carregar = async (req, res) => {
 
     //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
     if (propriedades.length === 0) {
-      return res.status(200).json({ Message: 'Nenhuma propriedade encontrada' })
+      return res.status(204).json({ Message: 'Nenhuma propriedade encontrada' })
     }
     //Retornar todas as propriedades selecionadas
     return res.status(200).json(propriedades)
