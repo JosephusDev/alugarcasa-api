@@ -38,10 +38,10 @@ export const cadastrar = async (req, res) => {
     const hashedPassword = await bcrypt.hash(senha, saltRounds)
 
     // Inserir o usuário no banco de dados
-    await pool.query(
-      'INSERT INTO usuario (nome, senha) VALUES (?, ?)',
-      [nome, hashedPassword],
-    )
+    await pool.query('INSERT INTO usuario (nome, senha) VALUES (?, ?)', [
+      nome,
+      hashedPassword,
+    ])
 
     // Retornar sucesso com o ID do usuário recém-cadastrado
     return res.status(200).json({ message: 'Usuário cadastrado com sucesso' })

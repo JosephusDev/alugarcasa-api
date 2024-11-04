@@ -26,25 +26,28 @@ export const carregarPorUsuario = async (req, res) => {
   const id = req.params.id
 
   try {
-      //Query para selecionar todas as propriedades
-      const [propriedades] = await pool.query(
-        'SELECT * FROM propriedade WHERE id_usuario = ?',
-        [id],
-      )
+    //Query para selecionar todas as propriedades
+    const [propriedades] = await pool.query(
+      'SELECT * FROM propriedade WHERE id_usuario = ?',
+      [id],
+    )
 
-      //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
-      if (propriedades.length === 0) {
-        return res
-          .status(200)
-          .json({ Message: 'Nenhuma propriedade do usuario encontrada' })
-      }
-      //Retornar todas as propriedades selecionadas
-      return res.status(200).json(propriedades)
+    //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
+    if (propriedades.length === 0) {
+      return res
+        .status(200)
+        .json({ Message: 'Nenhuma propriedade do usuario encontrada' })
+    }
+    //Retornar todas as propriedades selecionadas
+    return res.status(200).json(propriedades)
   } catch (error) {
     //Retornar Mensagem de erro
     return res
       .status(500)
-      .json({ message: 'Erro ao carregar propriedades do usuário', Erro: error })
+      .json({
+        message: 'Erro ao carregar propriedades do usuário',
+        Erro: error,
+      })
   }
 }
 
@@ -103,8 +106,6 @@ export const eliminar = async (req, res) => {
       .json({ message: 'Propriedade eliminada com sucesso!' })
   } catch (error) {
     //Retornar mensagem de erro! Bombo molhou :) ;)
-    return res
-      .status(500)
-      .json({ message: 'Erro ao eliminar a propriedade!' })
+    return res.status(500).json({ message: 'Erro ao eliminar a propriedade!' })
   }
 }
