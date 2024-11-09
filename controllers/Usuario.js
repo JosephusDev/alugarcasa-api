@@ -107,3 +107,56 @@ export const carregar = async (req, res) => {
 
   return res.status(200).json(usuarios)
 }
+
+export const editar = async (req, res) => {
+  const { nome, senha } = req.body
+  const id = req.params.id
+  console.log(nome)
+  console.log(senha)
+  try {
+    // Se senha estiver presente, validar e fazer hash
+    let hashedPassword = null
+    if (senha) {
+      // Validação da senha usando o esquema de validação
+      const senhaValida = esquema.validar(senha)
+      if (!senhaValida) {
+        return res.status(400).json({
+          detalhes: esquema.validar(senha, { detalhes: true }),
+        })
+      }
+      // Hash da senha
+      const saltRounds = 10
+      hashedPassword = await bcrypt.hash(senha, saltRounds)
+    }
+
+    // Lógica de atualização
+    if (nome && senha) {
+      // Atualizar nome e senha
+      await pool.query('UPDATE usuario SET nome = ?, senha = ? WHERE id = ?', [
+        nome,
+        hashedPassword,
+        id,
+      ])
+    } else if (nome) {
+      // Atualizar apenas o nome
+      await pool.query('UPDATE usuario SET nome = ? WHERE id = ?', [nome, id])
+    } else if (senha) {
+      // Atualizar apenas a senha
+      await pool.query('UPDATE usuario SET senha = ? WHERE id = ?', [
+        hashedPassword,
+        id,
+      ])
+    } else {
+      return res.status(400).json({
+        message: 'Nenhum campo fornecido para atualização.',
+      })
+    }
+
+    return res.status(200).json({ message: 'Perfil atualizado com sucesso' })
+  } catch (error) {
+    console.error('Erro ao atualizar Perfil:', error)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao atualizar Perfil.', error: error.message })
+  }
+}

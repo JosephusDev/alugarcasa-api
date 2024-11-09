@@ -42,12 +42,10 @@ export const carregarPorUsuario = async (req, res) => {
     return res.status(200).json(propriedades)
   } catch (error) {
     //Retornar Mensagem de erro
-    return res
-      .status(500)
-      .json({
-        message: 'Erro ao carregar propriedades do usuário',
-        Erro: error,
-      })
+    return res.status(500).json({
+      message: 'Erro ao carregar propriedades do usuário',
+      Erro: error,
+    })
   }
 }
 
