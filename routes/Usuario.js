@@ -6,6 +6,6 @@ const router = express.Router()
 router.post('/', cadastrar)
 router.post('/login', login)
 router.get('/', carregar)
-router.put('/editar/:id', editar)
+router.put('/:id', editar)
 
 export default router

@@ -111,8 +111,7 @@ export const carregar = async (req, res) => {
 export const editar = async (req, res) => {
   const { nome, senha } = req.body
   const id = req.params.id
-  console.log(nome)
-  console.log(senha)
+
   try {
     // Se senha estiver presente, validar e fazer hash
     let hashedPassword = null
