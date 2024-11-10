@@ -119,7 +119,7 @@ export const editar = async (req, res) => {
       // Validação da senha usando o esquema de validação
       const senhaValida = esquema.validar(senha)
       if (!senhaValida) {
-        return res.status(400).json({
+        return res.status(200).json({
           detalhes: esquema.validar(senha, { detalhes: true }),
         })
       }
