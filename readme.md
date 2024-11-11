@@ -1,4 +1,5 @@
 # Gerir usuários
+
 rota para Cadastrar novo usuario:
 /cadastrarUsuario
 {
@@ -7,7 +8,8 @@ rota para Cadastrar novo usuario:
 }
 
 rota para Login de usuario:
-``` js
+
+```js
     {
         "nome":
         "senha":
