@@ -16,7 +16,7 @@ esquema
   .espaco()
 
 export const cadastrar = async (req, res) => {
-  const { nome, senha, contato } = req.body
+  const { nome, contato, senha } = req.body
 
   // Verificação se o nome e a senha foram fornecidos
   if (!nome || !contato || !senha) {
