@@ -16,13 +16,13 @@ esquema
   .espaco()
 
 export const cadastrar = async (req, res) => {
-  const { nome, senha } = req.body
+  const { nome, senha, contato } = req.body
 
   // Verificação se o nome e a senha foram fornecidos
-  if (!nome || !senha) {
+  if (!nome || !contato || !senha) {
     return res
       .status(201)
-      .json({ message: 'Informe todos os dados necessários (nome e senha).' })
+      .json({ message: 'Informe todos os dados necessários (nome, contato e senha).' })
   }
 
   // Validação da senha usando o esquema de validação
@@ -38,7 +38,7 @@ export const cadastrar = async (req, res) => {
     const hashedPassword = await bcrypt.hash(senha, saltRounds)
 
     // Inserir o usuário no banco de dados
-    await pool.query('INSERT INTO usuario (nome, senha) VALUES (?, ?)', [
+    await pool.query('INSERT INTO usuario (nome, senha, contato) VALUES (?, ?, ?)', [
       nome,
       hashedPassword,
     ])
@@ -82,13 +82,14 @@ export const login = async (req, res) => {
 
     // Gerar o JWT
     const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '24h',
     })
 
     // Retornar Usuario com sucesso do login
     return res.json({
       id: usuario.id,
       nome: usuario.nome,
+      contato: usuario.contato,
       token,
     })
   } catch (error) {
@@ -109,7 +110,7 @@ export const carregar = async (req, res) => {
 }
 
 export const editar = async (req, res) => {
-  const { nome, senha } = req.body
+  const { nome, contato, senha } = req.body
   const id = req.params.id
 
   try {
@@ -129,22 +130,17 @@ export const editar = async (req, res) => {
     }
 
     // Lógica de atualização
-    if (nome && senha) {
+    if (nome && contato && senha) {
       // Atualizar nome e senha
-      await pool.query('UPDATE usuario SET nome = ?, senha = ? WHERE id = ?', [
+      await pool.query('UPDATE usuario SET nome = ?, senha = ?, contato = ? WHERE id = ?', [
         nome,
         hashedPassword,
+        contato,
         id,
       ])
-    } else if (nome) {
+    } else if (nome && contato) {
       // Atualizar apenas o nome
-      await pool.query('UPDATE usuario SET nome = ? WHERE id = ?', [nome, id])
-    } else if (senha) {
-      // Atualizar apenas a senha
-      await pool.query('UPDATE usuario SET senha = ? WHERE id = ?', [
-        hashedPassword,
-        id,
-      ])
+      await pool.query('UPDATE usuario SET nome = ?, contato = ? WHERE id = ?', [nome, contato, id])
     } else {
       return res.status(400).json({
         message: 'Nenhum campo fornecido para atualização.',
