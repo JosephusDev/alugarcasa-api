@@ -41,6 +41,7 @@ export const cadastrar = async (req, res) => {
     await pool.query('INSERT INTO usuario (nome, senha, contato) VALUES (?, ?, ?)', [
       nome,
       hashedPassword,
+      contato
     ])
 
     // Retornar sucesso com o ID do usuário recém-cadastrado
