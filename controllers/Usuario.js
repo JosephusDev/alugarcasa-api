@@ -20,11 +20,9 @@ export const cadastrar = async (req, res) => {
 
   // Verificação se o nome e a senha foram fornecidos
   if (!nome || !contato || !senha) {
-    return res
-      .status(201)
-      .json({
-        message: 'Informe todos os dados necessários (nome, contato e senha).',
-      })
+    return res.status(201).json({
+      message: 'Informe todos os dados necessários (nome, contato e senha).',
+    })
   }
 
   // Validação da senha usando o esquema de validação
@@ -84,7 +82,7 @@ export const login = async (req, res) => {
 
     // Gerar o JWT
     const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
-      expiresIn: '24h',
+      expiresIn: '2m',
     })
 
     // Retornar Usuario com sucesso do login

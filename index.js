@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import rotaUsuario from './routes/Usuario.js'
 import rotaPropriedade from './routes/Propriedade.js'
+import rotaVerifyToken from './routes/VerifyToken.js'
 import { autenticarToken } from './middleware/autenticacao.js'
 
 const app = express()
@@ -10,6 +11,7 @@ app.use(express.json())
 
 //Rotas públicas
 app.use('/usuario', rotaUsuario)
+app.use('/verify-token', rotaVerifyToken)
 
 //Middleware para verificar token JWT
 
