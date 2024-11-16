@@ -6,13 +6,14 @@ import {
   eliminar,
   carregarPorUsuario,
 } from '../controllers/Propriedade.js'
+import { upload } from '../middleware/upload_supabase.js'
 
 const router = express.Router()
 
 router.get('/', carregar)
 router.get('/:id', carregarPorUsuario)
-router.post('/', cadastrar)
+router.post('/', upload.single('imagem'), cadastrar)
 router.put('/:id', editar)
-router.delete('/:id', eliminar)
+router.delete('/:id/:newFileName', eliminar)
 
 export default router

@@ -22,7 +22,9 @@ export const cadastrar = async (req, res) => {
   if (!nome || !contato || !senha) {
     return res
       .status(201)
-      .json({ message: 'Informe todos os dados necessários (nome, contato e senha).' })
+      .json({
+        message: 'Informe todos os dados necessários (nome, contato e senha).',
+      })
   }
 
   // Validação da senha usando o esquema de validação
@@ -38,11 +40,10 @@ export const cadastrar = async (req, res) => {
     const hashedPassword = await bcrypt.hash(senha, saltRounds)
 
     // Inserir o usuário no banco de dados
-    await pool.query('INSERT INTO usuario (nome, senha, contato) VALUES (?, ?, ?)', [
-      nome,
-      hashedPassword,
-      contato
-    ])
+    await pool.query(
+      'INSERT INTO usuario (nome, senha, contato) VALUES (?, ?, ?)',
+      [nome, hashedPassword, contato],
+    )
 
     // Retornar sucesso com o ID do usuário recém-cadastrado
     return res.status(200).json({ message: 'Usuário cadastrado com sucesso' })
@@ -133,15 +134,16 @@ export const editar = async (req, res) => {
     // Lógica de atualização
     if (nome && contato && senha) {
       // Atualizar nome e senha
-      await pool.query('UPDATE usuario SET nome = ?, senha = ?, contato = ? WHERE id = ?', [
-        nome,
-        hashedPassword,
-        contato,
-        id,
-      ])
+      await pool.query(
+        'UPDATE usuario SET nome = ?, senha = ?, contato = ? WHERE id = ?',
+        [nome, hashedPassword, contato, id],
+      )
     } else if (nome && contato) {
       // Atualizar apenas o nome
-      await pool.query('UPDATE usuario SET nome = ?, contato = ? WHERE id = ?', [nome, contato, id])
+      await pool.query(
+        'UPDATE usuario SET nome = ?, contato = ? WHERE id = ?',
+        [nome, contato, id],
+      )
     } else {
       return res.status(400).json({
         message: 'Nenhum campo fornecido para atualização.',

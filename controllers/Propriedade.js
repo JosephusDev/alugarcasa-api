@@ -1,4 +1,39 @@
 import { pool } from '../config/database.js'
+import { createClient } from '@supabase/supabase-js'
+import dotenv from 'dotenv'
+dotenv.config()
+
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const uploadToSupabase = async (file) => {
+  const { originalname, buffer, mimetype } = file
+  const filePath = Date.now().toString()
+  const { data, error } = await supabase.storage
+    .from('meu-kubico')
+    .upload(filePath, buffer, {
+      contentType: mimetype,
+    })
+  if (error) {
+    throw new Error(`Erro ao fazer upload para Supabase: ${error.message}`)
+  }
+
+  const { data: dados } = supabase.storage
+    .from('meu-kubico')
+    .getPublicUrl(filePath)
+  return dados.publicUrl
+}
+
+const deleteToSupabase = async (text) => {
+  const { data, error } = await supabase.storage
+    .from('meu-kubico')
+    .remove([text])
+  if (error) {
+    console.log(error)
+  }
+  return data
+}
 
 //CARREGAR TODAS AS PROPRIEDADES CADASTRADAS
 export const carregar = async (req, res) => {
@@ -51,13 +86,18 @@ export const carregarPorUsuario = async (req, res) => {
 
 export const cadastrar = async (req, res) => {
   //Pegar os campos enviados
-  const { descricao, cidade, bairro, preco, imagem, id_usuario } = req.body
+  const { descricao, cidade, bairro, preco, id_usuario } = req.body
   //Faça a validação dos campo no FRONT
   try {
+    const file = req.file
+    if (!file) {
+      return res.status(200).json({ message: 'Nenhuma imagem enviada!' })
+    }
+    const fileUrl = await uploadToSupabase(file)
     //Fazer o insert dos dados
     await pool.query(
       'INSERT INTO propriedade(descricao, cidade, bairro, preco, imagem, id_usuario) VALUES ( ?, ?, ?, ?, ?, ? )',
-      [descricao, cidade, bairro, preco, imagem, id_usuario],
+      [descricao, cidade, bairro, preco, fileUrl, id_usuario],
     )
     //Retornar uma mensagem caso esteja tudo certo
     return res
@@ -67,7 +107,7 @@ export const cadastrar = async (req, res) => {
     //Retornar Mensagem de erro
     return res
       .status(500)
-      .json({ message: 'Erro ao Cadastrar propriedade', Erro: error })
+      .json({ message: 'Erro ao Cadastrar propriedade', Erro: error.message })
   }
 }
 
@@ -94,16 +134,26 @@ export const editar = async (req, res) => {
 }
 
 export const eliminar = async (req, res) => {
-  const id = req.params.id
+  const { id, newFileName } = req.params
   try {
+    const resultado = await deleteToSupabase(newFileName)
     //Fazer a exclusao da propriedade
-    await pool.query('DELETE FROM propriedade WHERE id = ?', [id])
-    //Retornar uma mensagem caso esteja tudo certo
-    return res
-      .status(200)
-      .json({ message: 'Propriedade eliminada com sucesso!' })
+    if (resultado.length === 0) {
+      await pool.query('DELETE FROM propriedade WHERE id = ?', [id])
+      //Retornar uma mensagem caso esteja tudo certo
+      return res
+        .status(200)
+        .json({ message: 'Propriedade eliminada com sucesso!' })
+    } else {
+      //Retornar mensagem de erro! Bombo molhou :) ;)
+      return res
+        .status(500)
+        .json({ message: 'Erro ao eliminar a propriedade!' })
+    }
   } catch (error) {
     //Retornar mensagem de erro! Bombo molhou :) ;)
-    return res.status(500).json({ message: 'Erro ao eliminar a propriedade!' })
+    return res
+      .status(500)
+      .json({ message: 'Erro ao eliminar a propriedade!', erro: error.message })
   }
 }
