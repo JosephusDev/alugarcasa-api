@@ -39,7 +39,7 @@ const deleteToSupabase = async (text) => {
 export const carregar = async (req, res) => {
   try {
     //Query para selecionar todas as propriedades
-    const [propriedades] = await pool.query('SELECT * FROM propriedade')
+    const [propriedades] = await pool.query('select p.*, u.contato from propriedade p, usuario u where p.id_usuario = u.id')
 
     //Verificar se não exite nenhuma propriedade cadastrada e retornar a mensagem
     if (propriedades.length === 0) {
