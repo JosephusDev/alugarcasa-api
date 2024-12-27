@@ -9,7 +9,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-//Rotas públicas
+//Rotas pública
 app.use('/usuario', rotaUsuario)
 app.use('/verify-token', rotaVerifyToken)
 
